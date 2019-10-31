@@ -20,7 +20,7 @@ document.onkeydown = function(ev) {
         board.pacman.update_dir(ev.keyCode);
     }
 
-    if (game_interval == undefined) {
+    if (ev.keyCode.is_between(directions.left, directions.down) && game_interval == undefined) {
         game_interval = setInterval(function() {
             board.pacman.move();
             if (!game_over) {

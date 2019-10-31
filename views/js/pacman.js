@@ -8,7 +8,7 @@ class Pacman {
         this.board = board;
         this.board_height = height;
         this.board_width = width;
-        this.powered_up = false;
+        this.powered_up = 0;
     }
 
     update_dir(dir) {
@@ -27,12 +27,6 @@ class Pacman {
     }
 
     move() {
-        // if (this.cell.classList.contains('ghost') && !this.powered_up) {
-        //     clearInterval(game_interval);
-        //     this.cell.id = '';
-        //     return;
-        // }
-
         if (this.dir == directions.up && !this.board.at_wall(this.row - 1, this.col)) {
             this.row = this.row - 1;
         }
@@ -55,28 +49,48 @@ class Pacman {
         this.cell.id = ''
         this.cell = this.board.cell(this.row, this.col);
         this.cell.id = 'pacman';
+        if (!this.cell.classList.contains('pathway')) {
+            this.cell.classList.add('pathway');
+        }
 
-        if (this.cell.classList.contains('ghost') && !this.powered_up) {
+        if (this.cell.classList.contains('ghost') && this.powered_up == 0) {
             clearInterval(game_interval);
             this.cell.id = '';
             game_over = true;
             return;
+        } else if (this.cell.classList.contains('ghost')) {
+            // eat the ghost
+            score += 200;
+            document.getElementById('score').innerHTML = score;
+            this.board.ghost.cell.classList.remove('ghost');
+            this.board.ghost.cell.classList.remove('scared-ghost');
+            this.board.ghost.can_chase = false;
+            setTimeout(function() {
+                board.ghost.col = 13;
+                board.ghost.row = 11;
+                board.ghost.cell = board.cell(board.ghost.row, board.ghost.col);
+                if (board.pacman.powered_up > 0) {
+                    board.ghost.cell.classList.add('scared-ghost');
+                }
+                board.ghost.cell.classList.add('ghost');
+                board.ghost.can_chase = true;
+            }, 10000)
         }
 
         if (this.cell.classList.contains('food')) {
             score += 10;
             document.getElementById('score').innerHTML = score;
-            this.cell.classList.remove(this.cell.classList[0]);
+            this.cell.classList.remove('food');
         }
         else if (this.cell.classList.contains('power-up')) {
             score += 50;
             document.getElementById('score').innerHTML = score;
-            this.cell.classList.remove(this.cell.classList[0]);
-            this.powered_up = true;
+            this.cell.classList.remove('power-up');
+            this.powered_up += 1;
             $('.ghost').addClass('scared-ghost');
 
             setTimeout(function() {
-                board.pacman.powered_up = false;
+                board.pacman.powered_up -= 1;
             }, 10000)
         }
     }
