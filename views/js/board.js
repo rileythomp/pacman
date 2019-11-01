@@ -10,12 +10,16 @@ class Board {
         ];
     }
 
-    cell(i, j) {
-        return this.view.children[0].children[i].children[j];
+    cell(row, col) {
+        return this.view.children[0].children[row].children[col];
     }
 
-    at_wall(row, col) {
-        return this.cell(row, col).classList.contains('wall');
+    at_barrier(barrier, row, col) {
+        return this.cell(row, col).classList.contains(barrier);
+    }
+
+    open_cell(row, col) {
+        return !this.at_barrier('wall', row, col) && !this.at_barrier('ghost', row, col);
     }
 
     kill_ghost(cell, ghost_color) {

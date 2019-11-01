@@ -10,37 +10,37 @@ class Pacman {
     }
 
     update_dir(dir) {
-        if (dir == directions.up && !this.board.at_wall(this.row - 1, this.col)) {
+        if (dir == directions.up && !this.board.at_barrier('wall', this.row - 1, this.col)) {
             this.dir = dir
         }
-        else if (dir == directions.left && !this.board.at_wall(this.row, this.col - 1)) {
+        else if (dir == directions.left && !this.board.at_barrier('wall', this.row, this.col - 1)) {
             this.dir = dir
         }
-        else if (dir == directions.down && !this.board.at_wall(this.row + 1, this.col)) {
+        else if (dir == directions.down && !this.board.at_barrier('wall', this.row + 1, this.col)) {
             this.dir = dir
         }
-        else if (dir == directions.right && !this.board.at_wall(this.row, this.col + 1)) {
+        else if (dir == directions.right && !this.board.at_barrier('wall', this.row, this.col + 1)) {
             this.dir = dir
         }
     }
 
     update_pos() {
-        if (this.dir == directions.up && !this.board.at_wall(this.row - 1, this.col)) {
+        if (this.dir == directions.up && !this.board.at_barrier('wall', this.row - 1, this.col)) {
             this.row = this.row - 1;
         }
         else if (this.dir == directions.left && this.col == 0) {
             this.col = this.board.width - 1;
         }
-        else if (this.dir == directions.left && !this.board.at_wall(this.row, this.col - 1)) {
+        else if (this.dir == directions.left && !this.board.at_barrier('wall', this.row, this.col - 1)) {
             this.col = this.col - 1;
         }
-        else if (this.dir == directions.down && !this.board.at_wall(this.row + 1, this.col)) {
+        else if (this.dir == directions.down && !this.board.at_barrier('wall', this.row + 1, this.col)) {
             this.row = this.row + 1;
         }
         else if (this.dir == directions.right && this.col == this.board.width - 1) {
             this.col = 0;
         }
-        else if (this.dir == directions.right && !this.board.at_wall(this.row, this.col + 1)) {
+        else if (this.dir == directions.right && !this.board.at_barrier('wall', this.row, this.col + 1)) {
             this.col = this.col + 1;
         }
     }

@@ -43,3 +43,9 @@ document.onkeydown = function(ev) {
         }
     }
 }
+
+document.addEventListener('click', function() {
+    for (let i = 0; i < board.ghosts.length; ++i) {
+        board.ghosts[i].chase();
+    }
+})
