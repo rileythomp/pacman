@@ -24,16 +24,83 @@ class Ghost {
         this.desired_vert = directions.down;
         this.desired_horiz = directions.right;
         this.desired_dir = this.desired_vert;
+        this.target_col = 0;
+        this.target_row = 0;
+    }
+
+    target_ahead_of_pacman(n) {
+        if (this.board.pacman.dir == directions.up) {
+            this.target_row = Math.max(this.board.pacman.row - n, 0);
+            this.target_col = this.board.pacman.col;
+        }
+        else if (this.board.pacman.dir == directions.down) {
+            this.target_row = Math.min(this.board.pacman.row + n, this.board.height - 1);
+            this.target_col = this.board.pacman.col;
+        }
+        else if (this.board.pacman.dir == directions.right) {
+            this.target_row = this.board.pacman.row;
+            this.target_col = Math.min(this.board.pacman.col + n, this.board.width - 1);
+        }
+        else if (this.board.pacman.dir == directions.left) {
+            this.target_row = this.board.pacman.row;
+            this.target_col = Math.max(this.board.pacman.col - n, 0);
+        }
+    }
+
+    update_target() {
+        if (this.color == 'orangeghost') {
+            let pacman_row = this.board.pacman.row;
+            let pacman_col = this.board.pacman.col;
+
+            let distance = Math.hypot(pacman_row - this.row, pacman_col - this.col);
+
+            if (distance > 10) {
+                this.target_row = this.board.pacman.row;
+                this.target_col = this.board.pacman.col;
+            } else {
+                this.target_row = this.board.height - 1;
+                this.target_col = Math.round(this.board.width/2);
+            }
+
+        } 
+        else if (this.color == 'redghost') {
+            this.target_row = this.board.pacman.row;
+            this.target_col = this.board.pacman.col;
+        }
+        else if (this.color == 'pinkghost') {
+            this.target_ahead_of_pacman(4);
+        }
+        else if (this.color == 'blueghost') {
+            this.target_ahead_of_pacman(2);
+
+            let red_row = document.querySelector('[data-ghost="redghost"]').getAttribute('data-row');
+            let red_col = document.querySelector('[data-ghost="redghost"]').getAttribute('data-col');    
+            
+            this.target_row = (2 * this.target_row) - red_row;
+            this.target_col = (2 * this.target_col) - red_col;
+
+            if (this.target_row < 0) {
+                this.target_row = 0;
+            } else if (this.target_row > this.board.height - 1) {
+                this.target_row = this.board.height - 1;
+            }
+
+            if (this.target_col < 0) {
+                this.target_col = 0;
+            } else if (this.target_col > this.board.width - 1) {
+                this.target_col = this.board.width - 1;
+            }
+        }
     }
 
     update_desired_dirs() {
-        let pacman_row = this.board.pacman.row;
-        let pacman_col = this.board.pacman.col;
-        let col_diff = Math.abs(pacman_col - this.col);
-        let row_diff = Math.abs(pacman_row - this.row);
+        this.update_target(this.color);
 
-        this.desired_vert = (pacman_row >= this.row ? directions.down : directions.up);
-        this.desired_horiz = (pacman_col >= this.col ? directions.right : directions.left);
+        let col_diff = Math.abs(this.target_col - this.col);
+        let row_diff = Math.abs(this.target_row - this.row);
+
+        this.desired_vert = (this.target_row >= this.row ? directions.down : directions.up);
+        this.desired_horiz = (this.target_col >= this.col ? directions.right : directions.left);
         this.desired_dir = (row_diff >= col_diff ? this.desired_vert : this.desired_horiz);
     }
 

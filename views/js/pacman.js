@@ -7,6 +7,7 @@ class Pacman {
         this.cell.id = 'pacman';
         this.board = board;
         this.power_ups = 0;
+        this.food_eaten = 1;
     }
 
     update_dir(dir) {
@@ -63,6 +64,7 @@ class Pacman {
         if (this.cell.classList.contains('food')) {
             add_to_score(10);
             this.cell.classList.remove('food');
+            this.food_eaten += 1;
         }
         else if (this.cell.classList.contains('power-up')) {
             add_to_score(50);

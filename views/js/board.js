@@ -6,8 +6,6 @@ class Board {
         this.pacman = new Pacman(this);
         this.ghosts = [
             new Ghost(this, 'redghost'),
-            new Ghost(this, 'blueghost'),
-            new Ghost(this, 'orangeghost'),
             new Ghost(this, 'pinkghost')
         ];
     }
@@ -54,7 +52,7 @@ class Board {
     }
 
     end_game(cell) {
-        clearInterval(game_interval);
+        clearInterval(pacman_interval);
         clearInterval(ghost_interval);
         cell.id = '';
         game_over = true;

@@ -16,7 +16,7 @@ function add_to_score(n) {
 
 let board = new Board();
 let score = 0;
-let game_interval;
+let pacman_interval;
 let ghost_interval;
 let game_started = false;
 let game_over = false;
@@ -29,8 +29,11 @@ document.onkeydown = function(ev) {
         if (!game_started) {
             game_started = true;
 
-            game_interval = setInterval(function() {
+            pacman_interval = setInterval(function() {
                 board.pacman.move();
+                if (board.pacman.food_eaten == 30) {
+                    board.ghosts.push(new Ghost(board, 'blueghost'))
+                }
             }, interval_length)
     
             ghost_interval = setInterval(function() {
@@ -39,7 +42,14 @@ document.onkeydown = function(ev) {
                         board.ghosts[i].chase();
                     }
                 }
-            }, interval_length + 25)
+            }, interval_length + 15)
         }
     }
 }
+
+document.addEventListener('click', function() {
+    clearInterval(pacman_interval);
+    for (let i = 0; i < board.ghosts.length; ++i) {
+        board.ghosts[i].chase();
+    }
+})
