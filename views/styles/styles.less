@@ -11,27 +11,57 @@ body {
         }
 
         .wall {
-            background-color: #1919A6;
+            border: 3px solid #1919a6;
+        }
+
+        .food, .power-up, .ghost, .scared-ghost, #pacman {
+            background-repeat: no-repeat;
+            background-position: center;
         }
 
         .food {
-            background-color: #DEA185;
+            background-image: url('food.png');
+            background-size: 0.45em;
         }
 
         .power-up {
-            background-color: lightgreen;
+            background-image: url('food.png');
+            background-size: 0.9em;
         }
 
         .ghost {
-            background-color: red;
+            // background-image: url('red.jpg');
+            // background-size: 1em;
+        }
+
+        [data-ghost='redghost'] {
+            background-image: url('red.jpg');
+            background-size: 1em;
+        }
+
+        [data-ghost='pinkghost'] {
+            background-image: url('pink.jpg');
+            background-size: 1em;
+        }
+
+        [data-ghost='blueghost'] {
+            background-image: url('blue.jpg');
+            background-size: 1em;
+        }
+
+        [data-ghost='orangeghost'] {
+            background-image: url('orange.jpg');
+            background-size: 1em;
         }
 
         .scared-ghost {
-            background-color: purple;
+            background-image: url('scared.png');
+            background-size: 1em;
         }
 
         #pacman {
-            background-color: yellow;
+            background-image: url('pacman.png');
+            background-size: 1em;
         }
     }
 }

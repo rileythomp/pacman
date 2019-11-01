@@ -1,14 +1,26 @@
 class Ghost {
-    constructor(board, row, col, height, width) {
+    set_start_pos(color) {
+        this.row = 11;
+
+        if (color == 'orangeghost') {
+            this.col = 12;
+        } else if (color == 'redghost') {
+            this.col = 13;
+        } else if (color == 'pinkghost') {
+            this.col = 14;
+        } else if (color == 'blueghost') {
+            this.col = 15;
+        }
+    }
+
+    constructor(board, color) {
+        this.color = color
+        this.set_start_pos(color)
         this.dir = directions.right;
-        this.cell = board.cell(row, col);
+        this.cell = board.cell(this.row, this.col);
         this.cell.classList.add('ghost');
-        this.row = row;
-        this.col = col;
+        this.cell.setAttribute('data-ghost', this.color);
         this.board = board;
-        this.board_height = height;
-        this.board_width = width;
-        this.can_chase = true;
         this.desired_dir = directions.right;
     }
 
@@ -29,8 +41,8 @@ class Ghost {
         }
     }
 
-    opposite_dirs(x) {
-        return Math.abs(this.dir - x) == 2;
+    opposite_dirs(dir) {
+        return Math.abs(this.dir - dir) == 2;
     }
     
     get_random_dir() {
@@ -41,13 +53,7 @@ class Ghost {
         return potential_dir;
     }
 
-    chase() {
-        if (!this.can_chase) {
-            return;
-        }
-
-        this.update_desired_dir();   
-        
+    update_dir() {
         if (this.desired_dir == directions.up && !this.board.at_wall(this.row - 1, this.col) && !this.opposite_dirs(this.desired_dir)) {
             this.dir = this.desired_dir;
         }
@@ -60,8 +66,9 @@ class Ghost {
         else if (this.desired_dir == directions.right && !this.board.at_wall(this.row, this.col + 1) && !this.opposite_dirs(this.desired_dir)) {
             this.dir = this.desired_dir;
         }
+    }
 
-        
+    update_pos() {
         let has_chased = false;
         while (!has_chased) {
             if (this.dir == directions.up && !this.board.at_wall(this.row - 1, this.col)) {
@@ -69,7 +76,7 @@ class Ghost {
                 has_chased = true;
             }
             else if (this.dir == directions.left && this.col == 0) {
-                this.col = this.board_width - 1;
+                this.col = this.board.width - 1;
                 has_chased = true;
             }
             else if (this.dir == directions.left && !this.board.at_wall(this.row, this.col - 1)) {
@@ -80,7 +87,7 @@ class Ghost {
                 this.row = this.row + 1;
                 has_chased = true;
             }
-            else if (this.dir == directions.right && this.col == this.board_width - 1) {
+            else if (this.dir == directions.right && this.col == this.board.width - 1) {
                 this.col = 0;
                 has_chased = true;
             }
@@ -91,43 +98,10 @@ class Ghost {
                 this.dir = this.get_random_dir();
             }
         }
+    }
 
-        // let has_chased = false;
-        // while (!has_chased) {
-        //     // if (this.desired_dir == directions.up && !this.board.at_wall(this.row - 1, this.col)) {
-        //     //     this.dir = this.desired_dir;
-        //     // }
-        //     // else if (this.desired_dir == directions.left && !this.board.at_wall(this.row, this.col - 1)) {
-        //     //     this.dir = this.desired_dir;
-        //     // }
-        //     // else if (this.desired_dir == directions.down && !this.board.at_wall(this.row + 1, this.col)) {
-        //     //     this.dir = this.desired_dir;
-        //     // }
-        //     // else if (this.desired_dir == directions.right && !this.board.at_wall(this.row, this.col + 1)) {
-        //     //     this.dir = this.desired_dir;
-        //     // }
-
-        //     if (this.dir == directions.up && !this.board.at_wall(this.row - 1, this.col)) {
-        //         this.row = this.row - 1;
-        //         has_chased = true;
-        //     }
-        //     else if (this.dir == directions.left && !this.board.at_wall(this.row, this.col - 1)) {
-        //         this.col = this.col - 1;
-        //         has_chased = true;
-        //     }
-        //     else if (this.dir == directions.down && !this.board.at_wall(this.row + 1, this.col)) {
-        //         this.row = this.row + 1;
-        //         has_chased = true;
-        //     }
-        //     else if (this.dir == directions.right && !this.board.at_wall(this.row, this.col + 1)) {
-        //         this.col = this.col + 1;
-        //         has_chased = true;
-        //     }
-        //     else {
-        //         this.dir = Math.floor(Math.random() * 4) + 37;
-        //     }
-        // }
-
+    update_ghost_view() {
+        this.cell.removeAttribute('data-ghost');
         this.cell.classList.remove('ghost');
         if (this.cell.classList.contains('scared-ghost')) {
             this.cell.classList.remove('scared-ghost');
@@ -135,32 +109,31 @@ class Ghost {
 
         this.cell = this.board.cell(this.row, this.col);
         this.cell.classList.add('ghost');
+        this.cell.setAttribute('data-ghost', this.color);
 
-        if (this.board.pacman.powered_up > 0) {
+        if (this.board.pacman.power_ups > 0) {
             this.cell.classList.add('scared-ghost');
         }
-
-        if (this.board.pacman.powered_up > 0 && this.cell.id == 'pacman') {
-            score += 200;
-            document.getElementById('score').innerHTML = score;
-            this.cell.classList.remove('ghost');
-            this.cell.classList.remove('scared-ghost');
-            this.can_chase = false;
-            setTimeout(function() {
-                board.ghost.col = 13;
-                board.ghost.row = 11;
-                board.ghost.cell = board.cell(board.ghost.row, board.ghost.col);
-                if (board.pacman.powered_up > 0) {
-                    board.ghost.cell.classList.add('scared-ghost');
-                }
-                board.ghost.cell.classList.add('ghost');
-                board.ghost.can_chase = true;
-            }, 10000)
+    }
+    
+    check_pacman_hit() {
+        if (this.cell.id == 'pacman' && this.board.pacman.power_ups > 0) {
+            board.eat_ghost(this.cell);
         }
         else if (this.cell.id == 'pacman') {
-            clearInterval(game_interval);
-            this.cell.id = '';
-            game_over = true;
+            board.end_game(this.cell);
         }
+    }
+
+    chase() {
+        this.update_desired_dir();   
+        
+        this.update_dir();
+        
+        this.update_pos();
+
+        this.update_ghost_view();
+
+        this.check_pacman_hit();
     }
 };
