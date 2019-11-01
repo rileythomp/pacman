@@ -42,34 +42,25 @@ class Ghost {
     }
     
     update_pos() {
-        let has_chased = false;
-        while (!has_chased) {
-            if (this.dir == directions.up && this.board.open_cell(this.row - 1, this.col)) {
-                this.row = this.row - 1;
-                has_chased = true;
-            }
-            else if (this.dir == directions.left && this.col == 0) {
-                this.col = this.board.width - 1;
-                has_chased = true;
-            }
-            else if (this.dir == directions.left && this.board.open_cell(this.row, this.col - 1)) {
-                this.col = this.col - 1;
-                has_chased = true;
-            }
-            else if (this.dir == directions.down && this.board.open_cell(this.row + 1, this.col)) {
-                this.row = this.row + 1;
-                has_chased = true;
-            }
-            else if (this.dir == directions.right && this.col == this.board.width - 1) {
-                this.col = 0;
-                has_chased = true;
-            }
-            else if (this.dir == directions.right && this.board.open_cell(this.row, this.col + 1)) {
-                this.col = this.col + 1;
-                has_chased = true;
-            } else {
-                this.dir = this.get_random_dir();
-            }
+        if (this.dir == directions.up && this.board.open_cell(this.row - 1, this.col)) {
+            this.row = this.row - 1;
+        }
+        else if (this.dir == directions.left && this.col == 0) {
+            this.col = this.board.width - 1;
+        }
+        else if (this.dir == directions.left && this.board.open_cell(this.row, this.col - 1)) {
+            this.col = this.col - 1;
+        }
+        else if (this.dir == directions.down && this.board.open_cell(this.row + 1, this.col)) {
+            this.row = this.row + 1;
+        }
+        else if (this.dir == directions.right && this.col == this.board.width - 1) {
+            this.col = 0;
+        }
+        else if (this.dir == directions.right && this.board.open_cell(this.row, this.col + 1)) {
+            this.col = this.col + 1;
+        } else {
+            console.warn('problem');
         }
     }
 
@@ -121,39 +112,27 @@ class Ghost {
 
         // Couldn't move in desired direction
         // Try desired direction in other orientation
-        else if (this.desired_dir == this.desired_vert) {
-            if (this.desired_horiz == directions.left && this.board.open_cell(this.row, this.col - 1) && !this.opposite_of_dir(this.desired_horiz)) {
-                this.dir = this.desired_horiz;
-            }
-            else if (this.desired_horiz == directions.right && this.board.open_cell(this.row, this.col + 1) && !this.opposite_of_dir(this.desired_horiz)) {
-                this.dir = this.desired_horiz;
-            }
+        else if (this.desired_dir == this.desired_vert && this.desired_horiz == directions.left && this.board.open_cell(this.row, this.col - 1) && !this.opposite_of_dir(this.desired_horiz)) {
+            this.dir = this.desired_horiz;
         }
-        else if (this.desired_dir == this.desired_horiz) {
-            if (this.desired_vert == directions.up && this.board.open_cell(this.row - 1, this.col) && !this.opposite_of_dir(this.desired_vert)) {
-                this.dir = this.desired_vert;
-            }
-            else if (this.desired_vert == directions.down && this.board.open_cell(this.row + 1, this.col) && !this.opposite_of_dir(this.desired_vert)) {
-                this.dir = this.desired_vert;
-            }
+        else if (this.desired_dir == this.desired_vert && this.desired_horiz == directions.right && this.board.open_cell(this.row, this.col + 1) && !this.opposite_of_dir(this.desired_horiz)) {
+            this.dir = this.desired_horiz;
+        }
+        else if (this.desired_dir == this.desired_horiz && this.desired_vert == directions.up && this.board.open_cell(this.row - 1, this.col) && !this.opposite_of_dir(this.desired_vert)) {
+            this.dir = this.desired_vert;
+        }
+        else if (this.desired_dir == this.desired_horiz && this.desired_vert == directions.down && this.board.open_cell(this.row + 1, this.col) && !this.opposite_of_dir(this.desired_vert)) {
+            this.dir = this.desired_vert;
         }
 
         // Couldn't go in desired vertical or horizontal directions
         // Try opposite direction in orientation that wasn't desired direction
         // E.g. desired_dir = down, desired_horiz = right, try left
-        else if (this.desired_dir == this.desired_vert) {
-            let second_horiz = this.opposite_of(this.desired_horiz);
-            let new_col = (second_horiz == directions.right ? this.col + 1 : this.col - 1);
-            if (this.board.open_cell(this.row, new_col) && !this.opposite_of_dir(second_horiz)) {
-                this.dir = second_horiz;
-            } 
+        else if (this.desired_dir == this.desired_vert && this.board.open_cell(this.row, (this.opposite_of(this.desired_horiz) == directions.right ? this.col + 1 : this.col - 1)) && !this.opposite_of_dir(this.opposite_of(this.desired_horiz))) {
+            this.dir = this.opposite_of(this.desired_horiz);
         }
-        else if (this.desired_dir == this.desired_horiz) {
-            let second_vert = this.opposite_of(this.desired_vert);
-            let new_row = (second_vert == directions.down ? this.row + 1 : this.row - 1);
-            if (this.board.open_cell(new_row, this.col) && !this.opposite_of_dir(second_vert)) {
-                this.dir = second_vert;
-            } 
+        else if (this.desired_dir == this.desired_horiz && this.board.open_cell((this.opposite_of(this.desired_vert) == directions.down ? this.row + 1 : this.row - 1), this.col) && !this.opposite_of_dir(this.opposite_of(this.desired_vert))) {
+            this.dir = this.opposite_of(this.desired_vert);
         }
 
         // Go in opposite direction of desired direction if can't move anywhere else
@@ -163,9 +142,7 @@ class Ghost {
     }
 
     chase() {
-        if (this.cell.classList.contains('intersection')) {
-            this.set_dir();
-        }
+        this.set_dir();
         
         this.update_pos();
 

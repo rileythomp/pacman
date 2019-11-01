@@ -6,6 +6,8 @@ class Board {
         this.pacman = new Pacman(this);
         this.ghosts = [
             new Ghost(this, 'redghost'),
+            new Ghost(this, 'blueghost'),
+            new Ghost(this, 'orangeghost'),
             new Ghost(this, 'pinkghost')
         ];
     }
@@ -36,10 +38,10 @@ class Board {
     }
 
     eat_ghost(cell) {
-        add_to_score(200);
-
         let ghost_color = cell.getAttribute('data-ghost');
         this.kill_ghost(cell, ghost_color);
+
+        add_to_score(100 * Math.pow(2, (4 - this.ghosts.length)));
 
         setTimeout(function() {
             board.ghosts.push(new Ghost(board, ghost_color));
