@@ -69,6 +69,9 @@ class Board {
                     if (cell.classList.contains("foodstart")) {
                         cell.classList.add("food");
                     }
+                    if (cell.classList.contains("powerstart")) {
+                        cell.classList.add("power-up");
+                    }
                 }
             }
             for (let i = 0; i < this.ghosts.length; ++i) {
