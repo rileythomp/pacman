@@ -8,6 +8,23 @@ class Pacman {
         this.board = board;
         this.power_ups = 0;
         this.food_eaten = 1;
+        this.lives = 3;
+    }
+
+    reset() {
+        this.row = 23;
+        this.col = 14;
+        this.dir = directions.left;
+        this.cell = board.cell(this.row, this.col);
+        this.cell.id = 'pacman';
+    }
+
+    revive() {
+        this.reset();
+        this.lives = 3;
+        this.food_eaten = 1;
+        this.power_ups = 0;
+        this.dir = directions.left;
     }
 
     update_dir(dir) {
@@ -65,6 +82,29 @@ class Pacman {
             add_to_score(10);
             this.cell.classList.remove('food');
             this.food_eaten += 1;
+            if (this.food_eaten >= 242) {
+                alert(`Congrats, you won! Final score: ${score - 10}`);
+                clearInterval(pacman_interval);
+                clearInterval(ghost_interval);
+                this.cell.id = '';
+                for (let i = 0; i < board.height; ++i) {
+                    for (let j = 0; j < board.width; ++j) {
+                        let cell = board.cell(i, j);
+                        if (cell.classList.contains("foodstart")) {
+                            cell.classList.add("food");
+                        }
+                    }
+                }
+                for (let i = 0; i < board.ghosts.length; ++i) {
+                    board.ghosts[i].kill();
+                }
+                board.ghosts = [
+                    new Ghost(board, 'redghost')
+                ];
+                game_started = false;
+                this.revive();
+                score = 0;
+            }
         }
         else if (this.cell.classList.contains('power-up')) {
             add_to_score(50);

@@ -1,21 +1,40 @@
 class Ghost {
-    set_start_pos(color) {
+    set_start_pos() {
         this.row = 11;
 
-        if (color == 'orangeghost') {
+        if (this.color == 'orangeghost') {
             this.col = 12;
-        } else if (color == 'redghost') {
+        } else if (this.color == 'redghost') {
             this.col = 13;
-        } else if (color == 'pinkghost') {
+        } else if (this.color == 'pinkghost') {
             this.col = 14;
-        } else if (color == 'blueghost') {
+        } else if (this.color == 'blueghost') {
             this.col = 15;
+        }
+    }
+
+    set_scatter_pos() {
+        if (this.color == "orangeghost") {
+            this.target_row = this.board.height - 1;
+            this.target_col = 0;
+        }
+        else if (this.color == "redghost") {
+            this.target_row = 0;
+            this.target_col = this.board.width - 1;
+        }
+        else if (this.color == "pinkghost") {
+            this.target_row = 0;
+            this.target_col = 0;
+        }
+        else if (this.color == "blueghost") {
+            this.target_row = this.board.height - 1;
+            this.target_col = this.board.width - 1;
         }
     }
 
     constructor(board, color) {
         this.color = color
-        this.set_start_pos(color)
+        this.set_start_pos()
         this.dir = directions.right;
         this.cell = board.cell(this.row, this.col);
         this.cell.classList.add('ghost');
@@ -24,8 +43,14 @@ class Ghost {
         this.desired_vert = directions.down;
         this.desired_horiz = directions.right;
         this.desired_dir = this.desired_vert;
-        this.target_col = 0;
-        this.target_row = 0;
+        this.set_scatter_pos();
+        this.scatters_remaining = 43;
+        this.chase_remaining = 133;
+    }
+
+    kill() {
+        this.cell.classList.remove('ghost');
+        this.cell.removeAttribute('data-ghost');
     }
 
     target_ahead_of_pacman(n) {
@@ -48,18 +73,24 @@ class Ghost {
     }
 
     update_target() {
+        if (this.scatters_remaining > 0) {
+            this.scatters_remaining -= 1;
+            this.set_scatter_pos(this.color);
+            return;
+        }
+
         if (this.color == 'orangeghost') {
             let pacman_row = this.board.pacman.row;
             let pacman_col = this.board.pacman.col;
 
-            let distance = Math.hypot(pacman_row - this.row, pacman_col - this.col);
+            let distance = Math.abs(pacman_row - this.row) + Math.abs(pacman_col - this.col);
 
-            if (distance > 10) {
+            if (distance > 8) {
                 this.target_row = this.board.pacman.row;
                 this.target_col = this.board.pacman.col;
             } else {
                 this.target_row = this.board.height - 1;
-                this.target_col = Math.round(this.board.width/2);
+                this.target_col = 1;
             }
 
         } 
@@ -91,6 +122,11 @@ class Ghost {
                 this.target_col = this.board.width - 1;
             }
         }
+        this.chase_remaining -= 1;
+        if (this.chase_remaining == 0) {
+            this.scatters_remaining = 43;
+            this.chase_remaining = 143;
+        }
     }
 
     update_desired_dirs() {
@@ -115,7 +151,7 @@ class Ghost {
         else if (this.dir == directions.left && this.col == 0) {
             this.col = this.board.width - 1;
         }
-        else if (this.dir == directions.left && this.board.open_cell(this.row, this.col - 1)) {
+        else if (this.dir == directions.left && this.col > 0 && this.board.open_cell(this.row, this.col - 1)) {
             this.col = this.col - 1;
         }
         else if (this.dir == directions.down && this.board.open_cell(this.row + 1, this.col)) {
@@ -124,7 +160,7 @@ class Ghost {
         else if (this.dir == directions.right && this.col == this.board.width - 1) {
             this.col = 0;
         }
-        else if (this.dir == directions.right && this.board.open_cell(this.row, this.col + 1)) {
+        else if (this.dir == directions.right && this.col < board.width && this.board.open_cell(this.row, this.col + 1)) {
             this.col = this.col + 1;
         } else {
             console.warn('problem');
@@ -209,6 +245,10 @@ class Ghost {
     }
 
     chase() {
+        if (this.board.pacman.power_ups > 0) {
+            this.scatters_remaining = 31;
+        }
+
         this.set_dir();
         
         this.update_pos();

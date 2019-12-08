@@ -1,12 +1,15 @@
 body {
-    font-family: Segoe UI;
+    font-family: Segoe UI, Poppins;
+    background-color: gray;
+    text-align: center;
 
     #board {
         border-collapse: collapse;
+        margin: 0 auto;
 
         td {
-            height: 1em;
-            width: 1em;
+            height: 1.5em;
+            width: 1.5em;
             background-color: black;
         }
 
@@ -58,5 +61,9 @@ body {
             background-image: url('pacman.png');
             background-size: 1em;
         }
+    }
+
+    #score-wrapper {
+        font-size: 2em !important;
     }
 }

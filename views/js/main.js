@@ -20,7 +20,7 @@ let pacman_interval;
 let ghost_interval;
 let game_started = false;
 let game_over = false;
-const interval_length = 125;
+const interval_length = 150;
 
 document.onkeydown = function(ev) {
     if (pressed_arrow_key(ev.keyCode)) {
@@ -31,8 +31,14 @@ document.onkeydown = function(ev) {
 
             pacman_interval = setInterval(function() {
                 board.pacman.move();
+                if (board.pacman.food_eaten == 5) {
+                    board.ghosts.push(new Ghost(board, 'pinkghost'));
+                }
                 if (board.pacman.food_eaten == 30) {
-                    board.ghosts.push(new Ghost(board, 'blueghost'))
+                    board.ghosts.push(new Ghost(board, 'blueghost'));
+                }
+                if (board.pacman.food_eaten == 81) {
+                    board.ghosts.push(new Ghost(board, 'orangeghost'));
                 }
             }, interval_length)
     
@@ -42,7 +48,7 @@ document.onkeydown = function(ev) {
                         board.ghosts[i].chase();
                     }
                 }
-            }, interval_length + 15)
+            }, interval_length + 10)
         }
     }
 }

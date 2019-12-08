@@ -5,8 +5,7 @@ class Board {
         this.width = this.view.children[0].children[0].children.length;
         this.pacman = new Pacman(this);
         this.ghosts = [
-            new Ghost(this, 'redghost'),
-            new Ghost(this, 'pinkghost')
+            new Ghost(this, 'redghost')
         ];
     }
 
@@ -15,7 +14,12 @@ class Board {
     }
 
     at_barrier(barrier, row, col) {
-        return this.cell(row, col).classList.contains(barrier);
+        try {
+            return this.cell(row, col).classList.contains(barrier);
+        }
+        catch (err) {
+            console.log(err);
+        }
     }
 
     open_cell(row, col) {
@@ -55,6 +59,34 @@ class Board {
         clearInterval(pacman_interval);
         clearInterval(ghost_interval);
         cell.id = '';
-        game_over = true;
+        this.pacman.reset();
+        this.pacman.lives -= 1;
+        if (this.pacman.lives < 1) {
+            alert('Oh no, you lost!');
+            for (let i = 0; i < this.height; ++i) {
+                for (let j = 0; j < this.width; ++j) {
+                    let cell = this.cell(i, j);
+                    if (cell.classList.contains("foodstart")) {
+                        cell.classList.add("food");
+                    }
+                }
+            }
+            for (let i = 0; i < this.ghosts.length; ++i) {
+                this.ghosts[i].kill();
+            }
+            this.ghosts = [
+                new Ghost(this, 'redghost')
+            ];
+            game_started = false;
+            this.pacman.revive();
+            score = 0;
+            document.getElementById('score').innerHTML = score;
+        } else {
+            for (let i = 0; i < this.ghosts.length; ++i) {
+                this.ghosts[i].set_start_pos();
+                this.ghosts[i].update_ghost_view();
+            }
+            game_started = false;
+        }
     }
 };
